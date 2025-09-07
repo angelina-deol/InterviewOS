@@ -71,10 +71,43 @@ const resumeExtractionPrompt = (resumeText) => `
     Important: Do NOT add any extra text. Only return valid JSON.
 `;
 
-// Phase 3+ prompt builders will be added here as each agent is built:
-//   - githubProjectSummaryPrompt(readme, fileTree, sampleCode)
+const githubProjectSummaryPrompt = (repoFullName, readme, fileList, dependencyFile) => `
+    You are an AI trained to analyze a GitHub repository and summarize its architecture.
+
+    Task:
+    - Repository: ${repoFullName}
+    - Identify the main technologies, languages, and frameworks used — specific names only (e.g. "FastAPI", "PostgreSQL"), not generic terms like "backend" or "database".
+    - Identify the architecture as an ordered array of short layer/component labels, in a top-to-bottom or request-flow order (e.g. ["Frontend", "Backend API", "ML Pipeline", "Database"]). Base this on the actual file structure and dependencies below, not assumptions.
+    - Write a 1-2 sentence summary of what the project does, in plain language.
+    - If the evidence is too thin to confidently determine something, use an empty array or a short honest summary rather than inventing detail.
+
+    README:
+    """
+    ${(readme || "(no README found)").slice(0, 4000)}
+    """
+
+    File list (${fileList.length} files analyzed):
+    ${fileList.join(", ") || "(none found)"}
+
+    ${dependencyFile ? `Dependency file (${dependencyFile.path}):\n"""\n${dependencyFile.content}\n"""` : "(no dependency manifest found)"}
+
+    Return a pure JSON object like:
+    {
+        "technologies": ["Tech1", "Tech2"],
+        "architectureLayers": ["Layer1", "Layer2"],
+        "summary": "Short summary here."
+    }
+    Important: Do NOT add any extra text. Only return valid JSON.
+`;
+
+// Phase 4+ prompt builders will be added here as each agent is built:
 //   - jobDescriptionAnalysisPrompt(jobDescriptionText)
 //   - interviewFollowUpPrompt(conversationHistory, projectContext)
 //   - feedbackScoringPrompt(question, candidateAnswer)
 
-module.exports = { questionAnswerPrompt, conceptExplainPrompt, resumeExtractionPrompt };
+module.exports = {
+    questionAnswerPrompt,
+    conceptExplainPrompt,
+    resumeExtractionPrompt,
+    githubProjectSummaryPrompt,
+};

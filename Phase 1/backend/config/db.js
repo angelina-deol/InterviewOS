@@ -47,19 +47,46 @@ const connectDB = () => {
         );
     `);
 
-    // Placeholder for Phase 3 (GitHub RAG). Not used yet, created now so the
-    // schema migration story stays additive rather than requiring a rewrite later.
-    // NOTE: will need an anonymousId column added before Phase 3 actually
-    // writes to it, following the same isolation pattern as everything else.
+    // GitHub-analyzed projects — a visitor can analyze multiple repos, so
+    // this is a list per anonymousId, not a single upsert like the resume
+    // profile. Holds the LLM-derived summary (technologies, architecture
+    // layers) plus lightweight commit metadata for display.
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS github_projects (
+            id TEXT PRIMARY KEY,
+            anonymousId TEXT NOT NULL,
+            repoUrl TEXT NOT NULL,
+            repoFullName TEXT,
+            name TEXT,
+            description TEXT,
+            technologies TEXT,        -- JSON-encoded string array
+            architectureLayers TEXT,  -- JSON-encoded string array
+            summary TEXT,
+            commits TEXT,             -- JSON-encoded array of {sha, message, author, date}
+            createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+            updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+    `);
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_github_projects_anon ON github_projects(anonymousId);`);
+
+    // Knowledge chunks — the RAG corpus. Each row is one chunk of text
+    // (a README section, a slice of a source file) plus its embedding
+    // vector, scoped to both the visitor and the specific project it came
+    // from. Embeddings are computed locally (see services/embeddingService.js)
+    // since Groq has no embeddings endpoint — no external call happens here.
     db.exec(`
         CREATE TABLE IF NOT EXISTS knowledge_chunks (
             id TEXT PRIMARY KEY,
-            source TEXT NOT NULL,        -- e.g. 'resume', 'github:<repo>', 'job_description'
+            anonymousId TEXT NOT NULL,
+            projectId TEXT NOT NULL,
+            source TEXT NOT NULL,        -- e.g. 'readme', 'file:src/index.js'
             content TEXT NOT NULL,
-            embedding TEXT,               -- JSON-encoded float array
-            createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+            embedding TEXT NOT NULL,     -- JSON-encoded float array
+            createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (projectId) REFERENCES github_projects(id) ON DELETE CASCADE
         );
     `);
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_knowledge_chunks_project ON knowledge_chunks(projectId);`);
 
     // Candidate profile — one per visitor, derived from their most recently
     // uploaded resume. Re-uploading replaces the previous profile (MVP is
