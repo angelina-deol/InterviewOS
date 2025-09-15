@@ -23,3 +23,26 @@ export interface GithubProject {
   createdAt: string;
   updatedAt: string;
 }
+
+export type InterviewMode = "technical" | "deep_dive" | "behavioral";
+
+export interface Interview {
+  id: string;
+  anonymousId: string;
+  mode: InterviewMode;
+  role: string;
+  experience: string;
+  topicsToFocus: string;
+  projectId: string | null;
+  status: "active" | "completed";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InterviewMessage {
+  id: string;
+  interviewId: string;
+  role: "interviewer" | "candidate";
+  content: string;
+  createdAt: string;
+}

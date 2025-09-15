@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Play, Target, MessageSquareText, TrendingUp, Loader2, GitBranch } from "lucide-react";
+import { Target, MessageSquareText, TrendingUp, Loader2, GitBranch } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { GithubAnalyze } from "./GithubAnalyze";
+import { StartInterviewForm } from "./StartInterviewForm";
 import { apiFetch } from "@/lib/apiClient";
 import type { GithubProject } from "@/lib/types";
 
@@ -121,22 +121,18 @@ export function ProgressPanel() {
       </Card>
 
       {/* Start interview panel */}
-      <Card className="glow-violet relative overflow-hidden p-8 sm:p-10">
-        <div className="max-w-md">
-          <span className="font-mono text-[11px] text-signal/80">
-            {"// ready when you are"}
-          </span>
-          <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-            Start a mock interview
-          </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-mist">
-            InterviewOS will pull questions from your uploaded projects and
-            target role. No setup needed beyond what&apos;s in your profile.
-          </p>
-          <Button size="lg" variant="primary" className="mt-6">
-            <Play className="h-4 w-4" />
-            Start Interview
-          </Button>
+      <Card className="glow-violet relative overflow-hidden p-6 sm:p-8">
+        <span className="font-mono text-[11px] text-signal/80">
+          {"// ready when you are"}
+        </span>
+        <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+          Start a mock interview
+        </h2>
+        <p className="mt-3 max-w-md text-[15px] leading-relaxed text-mist">
+          Pick a mode, tell it the role you&apos;re targeting, and go.
+        </p>
+        <div className="mt-6">
+          <StartInterviewForm projects={projects} />
         </div>
       </Card>
 

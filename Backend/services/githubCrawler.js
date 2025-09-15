@@ -21,16 +21,38 @@ const MAX_FILES = 25;
 const MAX_FILE_BYTES = 50_000; // skip unusually large files (generated code, data dumps)
 
 /**
- * Accepts a full GitHub URL or an "owner/repo" shorthand.
+ * Accepts a full GitHub URL (any common variant: https, no-protocol,
+ * www-prefixed, SSH-style, with trailing /tree/.. or /blob/.. paths, with
+ * a ?tab=... query string or #readme hash from a browser copy-paste) or a
+ * plain "owner/repo" shorthand.
  */
 const parseGithubUrl = (input) => {
-    const cleaned = input.trim().replace(/\.git$/, "").replace(/\/$/, "");
-    const urlMatch = cleaned.match(/github\.com[:/]([^/]+)\/([^/]+)/i);
+    let cleaned = input.trim();
+
+    // Strip stray wrapping characters people sometimes paste along with a
+    // link (markdown angle brackets, quotes copied from chat/docs).
+    cleaned = cleaned.replace(/^[<"'\s]+|[>"'\s]+$/g, "");
+
+    // Drop query string and hash fragment — very common when copying a URL
+    // straight from the browser address bar (e.g. "?tab=readme-ov-file",
+    // "#readme", "#L10-L20").
+    cleaned = cleaned.split("?")[0].split("#")[0];
+
+    // Drop trailing slash and .git suffix
+    cleaned = cleaned.replace(/\/+$/, "").replace(/\.git$/i, "");
+
+    // Matches github.com/owner/repo, www.github.com/owner/repo,
+    // git@github.com:owner/repo, and the same with a /tree/branch,
+    // /blob/branch/path, /issues, etc. trailing after repo.
+    const urlMatch = cleaned.match(/github\.com[:/]+([^/\s]+)\/([^/\s]+)/i);
+    // Matches a bare "owner/repo" shorthand with nothing else attached.
     const shorthandMatch = cleaned.match(/^([^/\s]+)\/([^/\s]+)$/);
     const match = urlMatch || shorthandMatch;
 
     if (!match) {
-        throw new Error("Could not parse a GitHub owner/repo from that input.");
+        throw new Error(
+            `Could not parse a GitHub owner/repo from "${input}". Try a full URL like https://github.com/owner/repo, or just "owner/repo".`
+        );
     }
 
     return { owner: match[1], repo: match[2] };
