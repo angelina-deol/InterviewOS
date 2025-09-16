@@ -115,6 +115,41 @@ const connectDB = () => {
         );
     `);
 
+    // Interviews — one multi-turn conversation. mode is 'technical',
+    // 'deep_dive', or 'behavioral'. projectId is only set for deep_dive
+    // mode, linking to a github_projects row so follow-ups can be grounded
+    // in that repo's actual content via RAG.
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS interviews (
+            id TEXT PRIMARY KEY,
+            anonymousId TEXT NOT NULL,
+            mode TEXT NOT NULL,
+            role TEXT NOT NULL,
+            experience TEXT,
+            topicsToFocus TEXT,
+            projectId TEXT,
+            status TEXT NOT NULL DEFAULT 'active',
+            createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+            updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (projectId) REFERENCES github_projects(id) ON DELETE SET NULL
+        );
+    `);
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_interviews_anon ON interviews(anonymousId);`);
+
+    // Interview messages — the conversation transcript. role is
+    // 'interviewer' or 'candidate'.
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS interview_messages (
+            id TEXT PRIMARY KEY,
+            interviewId TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (interviewId) REFERENCES interviews(id) ON DELETE CASCADE
+        );
+    `);
+    db.exec(`CREATE INDEX IF NOT EXISTS idx_interview_messages_interview ON interview_messages(interviewId);`);
+
     console.log(`SQLite connected at ${DB_PATH}`);
     return db;
 };

@@ -12,6 +12,7 @@ const questionRoutes = require("./routes/questionRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const githubRoutes = require("./routes/githubRoutes");
+const interviewRoutes = require("./routes/interviewRoutes");
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/api/questions", requireAnonId, questionRoutes);
 app.use("/api/ai", requireAnonId, aiRoutes);
 app.use("/api/resume", requireAnonId, resumeRoutes);
 app.use("/api/github", requireAnonId, githubRoutes);
+app.use("/api/interviews", requireAnonId, interviewRoutes);
 
 // Serve uploads folder
 app.use("/uploads", express.static(uploadsDir));

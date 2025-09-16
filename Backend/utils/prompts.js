@@ -100,14 +100,62 @@ const githubProjectSummaryPrompt = (repoFullName, readme, fileList, dependencyFi
     Important: Do NOT add any extra text. Only return valid JSON.
 `;
 
-// Phase 4+ prompt builders will be added here as each agent is built:
-//   - jobDescriptionAnalysisPrompt(jobDescriptionText)
-//   - interviewFollowUpPrompt(conversationHistory, projectContext)
-//   - feedbackScoringPrompt(question, candidateAnswer)
+const MODE_INSTRUCTIONS = {
+    technical: "Ask questions about algorithms, system design, architecture, and debugging scenarios appropriate for the role and experience level. Do not reference a specific personal project unless the candidate brings one up themselves.",
+    deep_dive: "You have reviewed the candidate's actual GitHub repository (context provided below, pulled from their real README and source files). Ask specific, pointed questions about real design decisions, tradeoffs, and architecture choices visible in that code — the way a real interviewer who actually read the code would. Reference specific technologies or files from the context when relevant.",
+    behavioral: "Ask a behavioral question about a professional engineering experience, in a way that invites a STAR-format answer (Situation, Task, Action, Result) without requiring the candidate to know that acronym. Do not ask technical or coding questions in this mode.",
+};
+
+const interviewOpeningPrompt = ({ mode, role, experience, topicsToFocus, projectContext }) => `
+    You are an experienced technical interviewer conducting a ${mode.replace("_", " ")} interview.
+
+    Candidate:
+    - Target role: ${role}
+    - Experience: ${experience || "unspecified"} years
+    - Focus topics: ${topicsToFocus || "general software engineering"}
+
+    Mode instructions: ${MODE_INSTRUCTIONS[mode]}
+
+    ${projectContext ? `Project context (from the candidate's actual repository):\n"""\n${projectContext}\n"""` : ""}
+
+    Task: Ask your opening interview question. Sound like a real interviewer opening a conversation — natural, one question, not a numbered list or a preamble.
+
+    Return a pure JSON object like:
+    {
+        "question": "Your opening question here."
+    }
+    Important: Do NOT add any extra text. Only return valid JSON.
+`;
+
+const interviewFollowUpPrompt = ({ mode, transcript, projectContext }) => `
+    You are an experienced technical interviewer conducting a ${mode.replace("_", " ")} interview.
+
+    Mode instructions: ${MODE_INSTRUCTIONS[mode]}
+
+    ${projectContext ? `Project context (from the candidate's actual repository):\n"""\n${projectContext}\n"""` : ""}
+
+    Conversation so far:
+    """
+    ${transcript}
+    """
+
+    Task: Based on the candidate's most recent answer, ask ONE natural follow-up question. React genuinely to specifics in their answer where possible — probe deeper on something interesting, vague, or debatable, the way a real interviewer would. Keep it to a single question, no preamble.
+
+    Return a pure JSON object like:
+    {
+        "question": "Your follow-up question here."
+    }
+    Important: Do NOT add any extra text. Only return valid JSON.
+`;
+
+// Phase 5 prompt builder will be added here:
+//   - feedbackScoringPrompt(transcript)
 
 module.exports = {
     questionAnswerPrompt,
     conceptExplainPrompt,
     resumeExtractionPrompt,
     githubProjectSummaryPrompt,
+    interviewOpeningPrompt,
+    interviewFollowUpPrompt,
 };
