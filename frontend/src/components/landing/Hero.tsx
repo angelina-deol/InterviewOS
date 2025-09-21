@@ -65,11 +65,11 @@ export function Hero() {
             variants={fadeUp}
             className="mt-9 flex flex-wrap items-center gap-4"
           >
-            <Button size="lg" variant="primary" onClick={() => router.push("/dashboard")}>
+            <Button size="lg" variant="primary" onClick={() => router.push("/dashboard#start-interview")}>
               Start Free Interview
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button size="lg" variant="ghost" onClick={() => router.push("/dashboard")}>
+            <Button size="lg" variant="ghost" onClick={() => router.push("/dashboard#github-analysis")}>
               <Code2 className="h-4 w-4" />
               Analyze my GitHub
             </Button>

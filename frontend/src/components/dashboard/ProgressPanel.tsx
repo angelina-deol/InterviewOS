@@ -57,7 +57,7 @@ export function ProgressPanel() {
       </div>
 
       {/* GitHub analysis */}
-      <Card className="p-6">
+      <Card id="github-analysis" className="p-6">
         <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-mist/60">
           <GitBranch className="h-3.5 w-3.5" />
           github analysis
@@ -121,7 +121,7 @@ export function ProgressPanel() {
       </Card>
 
       {/* Start interview panel */}
-      <Card className="glow-violet relative overflow-hidden p-6 sm:p-8">
+      <Card id="start-interview" className="glow-violet relative overflow-hidden p-6 sm:p-8">
         <span className="font-mono text-[11px] text-signal/80">
           {"// ready when you are"}
         </span>

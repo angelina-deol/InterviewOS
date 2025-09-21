@@ -48,7 +48,7 @@ export function Nav() {
           )}
         </nav>
 
-        <Button size="sm" variant="primary" onClick={() => router.push("/dashboard")}>
+        <Button size="sm" variant="primary" onClick={() => router.push("/dashboard#start-interview")}>
           Start Free Interview
         </Button>
       </div>

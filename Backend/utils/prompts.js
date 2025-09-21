@@ -148,8 +148,35 @@ const interviewFollowUpPrompt = ({ mode, transcript, projectContext }) => `
     Important: Do NOT add any extra text. Only return valid JSON.
 `;
 
-// Phase 5 prompt builder will be added here:
-//   - feedbackScoringPrompt(transcript)
+const feedbackScoringPrompt = (transcript, mode, role) => `
+    You are an experienced technical interviewer providing honest, constructive feedback after a ${mode.replace("_", " ")} interview for a ${role} role.
+
+    Task:
+    - Review the full conversation transcript below.
+    - Evaluate ONLY the candidate's answers — not the interviewer's questions.
+    - Score three dimensions from 0-100:
+      - technicalDepth: how substantive, accurate, and specific the candidate's technical reasoning was. For behavioral-mode transcripts, score this based on the concreteness and relevance of the example they gave instead of coding/algorithm depth.
+      - communication: how clearly and coherently the candidate explained their thinking.
+      - confidence: how directly and assuredly the candidate answered, versus hedging, rambling, or being evasive.
+    - Be honest and specific — do not default to high scores. Short, vague, or evasive answers should score low, and say so plainly in the summary.
+    - Write a 2-3 sentence summary of overall performance.
+    - Give 2-4 concrete, actionable improvement suggestions grounded in specific moments from the transcript — not generic advice like "practice more."
+
+    Transcript:
+    """
+    ${transcript}
+    """
+
+    Return a pure JSON object like:
+    {
+        "technicalDepth": 0,
+        "communication": 0,
+        "confidence": 0,
+        "summary": "2-3 sentence summary here.",
+        "suggestions": ["Suggestion 1", "Suggestion 2"]
+    }
+    Important: Do NOT add any extra text. Only return valid JSON.
+`;
 
 module.exports = {
     questionAnswerPrompt,
@@ -158,4 +185,5 @@ module.exports = {
     githubProjectSummaryPrompt,
     interviewOpeningPrompt,
     interviewFollowUpPrompt,
+    feedbackScoringPrompt,
 };

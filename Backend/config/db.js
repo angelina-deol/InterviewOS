@@ -150,6 +150,25 @@ const connectDB = () => {
     `);
     db.exec(`CREATE INDEX IF NOT EXISTS idx_interview_messages_interview ON interview_messages(interviewId);`);
 
+    // Interview feedback — one row per interview, generated once from the
+    // full transcript. Kept as its own table (rather than columns on
+    // interviews) so an interview can exist without feedback yet (still in
+    // progress) without nullable-column sprawl on the main table.
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS interview_feedback (
+            id TEXT PRIMARY KEY,
+            interviewId TEXT NOT NULL UNIQUE,
+            anonymousId TEXT NOT NULL,
+            technicalDepth INTEGER,
+            communication INTEGER,
+            confidence INTEGER,
+            summary TEXT,
+            suggestions TEXT,   -- JSON-encoded string array
+            createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (interviewId) REFERENCES interviews(id) ON DELETE CASCADE
+        );
+    `);
+
     console.log(`SQLite connected at ${DB_PATH}`);
     return db;
 };

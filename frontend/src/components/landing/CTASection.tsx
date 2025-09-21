@@ -27,7 +27,7 @@ export function CTASection() {
             Free to try. No account required for the MVP — just upload and go.
           </p>
           <div className="mt-8 flex justify-center">
-            <Button size="lg" variant="primary" onClick={() => router.push("/dashboard")}>
+            <Button size="lg" variant="primary" onClick={() => router.push("/dashboard#start-interview")}>
               Start Free Interview
               <ArrowRight className="h-4 w-4" />
             </Button>
