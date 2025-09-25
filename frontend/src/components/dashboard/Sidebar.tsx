@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { FolderGit2, FileCode2, User, Terminal, Loader2 } from "lucide-react";
 import { apiFetch } from "@/lib/apiClient";
 import type { CandidateProfile } from "@/lib/types";
@@ -35,14 +36,14 @@ export function Sidebar() {
 
   return (
     <aside className="glass flex h-full w-full flex-col rounded-2xl p-5 md:w-72 md:shrink-0">
-      <div className="flex items-center gap-2 pb-5">
+      <Link href="/" className="flex items-center gap-2 pb-5 transition-opacity hover:opacity-80">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet to-indigo">
           <Terminal className="h-4 w-4 text-paper" strokeWidth={2.25} />
         </span>
         <span className="font-display text-[15px] font-semibold tracking-tight">
           InterviewOS
         </span>
-      </div>
+      </Link>
 
       {/* Candidate profile */}
       <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">

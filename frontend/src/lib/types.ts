@@ -46,3 +46,15 @@ export interface InterviewMessage {
   content: string;
   createdAt: string;
 }
+
+export interface InterviewFeedback {
+  id: string;
+  interviewId: string;
+  anonymousId: string;
+  technicalDepth: number | null;
+  communication: number | null;
+  confidence: number | null;
+  summary: string;
+  suggestions: string[];
+  createdAt: string;
+}
